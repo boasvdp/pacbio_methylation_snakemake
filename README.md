@@ -21,11 +21,11 @@ Unicycler and pbmm2 will be installed through conda, integrated in Snakemake.
 
 This pipeline combines several tools to end up with motifs associated with particular methylation. The tools and their functions are:
 
-| Tool | Purpose | Outputs |
-|----|----|----|
-| Unicycler | Hybrid assembly of complete genome | Assembly fasta (`asembly.fasta`) and some quality control files |
-| pbmm2 | Mapping of PacBio reads to assembly | Bam file ("native PacBio" format) |
-| ipdSummary | Identification of m6A, m4C and unknown modifications from mapped reads | Modifications file in GFF3 format and an exhaustive overview of kinetics per nt in csv format |
-| MultiMotifMaker | Identification of motifs associated with modifications | Csv file containing motifs |
+| Tool | Purpose | Outputs | Link | 
+|----|----|----|----|
+| Unicycler | Hybrid assembly of complete genome | Assembly fasta (`asembly.fasta`) and some quality control files | https://github.com/rrwick/Unicycler |
+| pbmm2 | Mapping of PacBio reads to assembly | Bam file ("native PacBio" format) | https://github.com/PacificBiosciences/pbmm2 |
+| ipdSummary | Identification of m6A, m4C and unknown modifications from mapped reads | Modifications file in GFF3 format and an exhaustive overview of kinetics per nt in csv format | https://github.com/PacificBiosciences/kineticsTools |
+| MultiMotifMaker | Identification of motifs associated with modifications | Csv file containing motifs | https://github.com/bioinfomaticsCSU/MultiMotifMaker |
 
 The final csv file containing motifs is the main output.
