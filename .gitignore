@@ -1,0 +1,8 @@
+illumina_fastq
+pacbio_fa
+smrtlink
+smrtlink_10.1.0.119588.run
+smrtlink_10.1.0.119588.run.md5
+.snakemake
+snakemake.job
+tools

@@ -1,0 +1,9 @@
+unicycler:
+ general: "--verbosity 2 --keep 1"
+
+pbmm2:
+ general: "--sort --log-level INFO"
+
+ipdsummary:
+ general: "--log-level INFO --methylFraction"
+ mods: "m6A,m4C"
