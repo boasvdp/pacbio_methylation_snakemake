@@ -5,15 +5,35 @@ IDS = ['WT', 'LMA', 'LME', 'LMH', 'dHsdS']
 rule all:
   input:
     expand("unicycler_out/{sample}", sample=IDS),    
-    expand("pbmm2_out/{sample}.bam", sample=IDS),
+    expand("pbmm2_out/{sample}_pbmm2.bam", sample=IDS),
     expand("ipdsummary_out/{sample}_modifications.gff", sample=IDS),
     expand("multimotifmaker_out/{sample}_motifs.csv", sample=IDS),
 
+#rule flye:
+#  input:
+#    nanopore = "nanopore_fastq/{sample}.fastq.gz",
+#    pacbio = "pacbio_fa/{sample}.fa"
+#  output:
+#    directory("flye_out/{sample}")
+#  conda:
+#    "envs/flye.yaml"
+#  log:
+#    "logs/flye/{sample}.log"
+#  params:
+#    genome_size = config['flye']['genome_size']
+#  threads: 16
+#  shell:
+#    """
+#    flye -o {output} --pacbio-raw {input.pacbio} --nano-raw {input.nanopore} --genome-size {params.genome_size} --threads {threads}
+#    """
+
 rule unicycler:
   input:
+    nanopore = "nanopore_fastq/{sample}.fastq.gz",
+    pacbio = "pacbio_fa/{sample}.fa",
     fw = "illumina_fastq/{sample}_R1.fastq.gz",
     rv = "illumina_fastq/{sample}_R2.fastq.gz",
-    pacbio = "pacbio_fa/{sample}.fa"
+    startgenes = "startgenes.fasta"
   output:
     directory("unicycler_out/{sample}")
   conda:
@@ -25,15 +45,15 @@ rule unicycler:
   threads: 16
   shell:
     """
-    unicycler -1 {input.fw} -2 {input.rv} -l {input.pacbio} -o {output} --threads {threads} {params.general} 2>&1>{log}
+    unicycler --long {input.pacbio} --long {input.nanopore} -1 {input.fw} -2 {input.rv} -o {output} --threads {threads} --start_genes {input.startgenes} {params.general} 2>&1>{log}
     """
 
 rule pbmm2:
   input:
     unicycler_dir = "unicycler_out/{sample}",
-    pacbio = "pacbio_fa/{sample}.fa"
+    pacbio = "pacbio_bam/{sample}.bam"
   output:
-    "pbmm2_out/{sample}.bam"
+    "pbmm2_out/{sample}_pbmm2.bam"
   conda:
     "envs/pbmm2.yaml"
   log:
@@ -48,7 +68,7 @@ rule pbmm2:
 
 rule ipdsummary:
   input:
-    bam = "pbmm2_out/{sample}.bam",
+    bam = "pbmm2_out/{sample}_pbmm2.bam",
     unicycler_dir = "unicycler_out/{sample}"
   output:
     gff = "ipdsummary_out/{sample}_modifications.gff",
@@ -61,6 +81,7 @@ rule ipdsummary:
   threads: 16
   shell:
     """
+    samtools faidx {input.unicycler_dir}/assembly.fasta
     smrtlink/install/smrtlink-release_10.1.0.119588/bundles/smrttools/install/smrttools-release_10.1.0.119588/private/pacbio/python3pkgs/kineticstools-py3/binwrap/ipdSummary \
  --reference {input.unicycler_dir}/assembly.fasta --identify {params.mods} --gff {output.gff} --csv {output.csv} -j {threads} {params.general} {input.bam} 2>&1>{log}
     """

@@ -1,3 +1,6 @@
+flye:
+ genome_size: "2.2m"
+
 unicycler:
  general: "--verbosity 2 --keep 1"
 
